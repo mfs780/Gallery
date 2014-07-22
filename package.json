@@ -1,11 +1,11 @@
 {
-  "name": "myapp",
-  "description": "Boilerplate web app using node, express, mongodb, backbone, marionette.  Tooling includes Grunt, Bower, Browserify, etc.",
+  "name": "Gallery",
+  "description": "Gallery App with Filtering based on Login",
   "version": "0.0.1",
-  "author": "Jason Krol",
+  "author": "Mohammad Fahad sheikh",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jkat98/benm.git"
+    "url": "https://github.com/mfs780/gallery.git"
   },
   "engines": {
     "node": "0.10.x"
@@ -19,10 +19,14 @@
     "mongoose": "~3.8.3",
     "handlebars-runtime": "~1.0.12",
     "express3-handlebars": "~0.5.0",
-    "MD5": "~1.2.0"
+    "MD5": "~1.2.0",
+    "walk": "*",
+    "exif": "git://github.com/cianclarke/node-exif.git",
+    "imagemagick" : "*"
   },
   "devDependencies": {
     "bower": "~1.2.8",
+    "colors": "*",
     "grunt": "~0.4.1",
     "grunt-contrib-concat": "~0.3.0",
     "grunt-contrib-jshint": "~0.7.2",

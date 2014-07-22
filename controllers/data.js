@@ -2,21 +2,39 @@ var models = require('../app/models'),
     md5 = require('MD5');
 
 module.exports = {
-    index: function(req, res) {
-        models.Contact.find({}, function(err, data) {
+    albums: function(req, res) {
+        models.Album.find({}, function(err, data) {
             res.json(data);
         });
     },
-    getById: function(req, res) {
-        models.Contact.find({ _id: req.params.id }, function(err, contact) {
+    albumsGetById: function(req, res) {
+        models.Album.find({ _id: req.params.id }, function(err, data) {
             if (err) {
-                res.json({error: 'Contact not found.'});
+                res.json({error: 'Album not found.'});
             } else {
-                res.json(contact);
+                res.json(data);
             }
         });
     },
-    add: function(req, res) {
+    photosGetById: function(req, res) {
+        models.Photo.find({ _id: req.params.id }, function(err, data) {
+            if (err) {
+                res.json({error: 'Photo not found.'});
+            } else {
+                res.json(data);
+            }
+        });
+    },
+    photosInAlbumGetById: function(req, res) {
+        models.Photo.find({ album: req.params.id }, function(err, data) {
+            if (err) {
+                res.json({error: 'Photo not found.'});
+            } else {
+                res.json(data);
+            }
+        });
+    },
+    /*add: function(req, res) {
         var newContact = new models.Contact(req.body);
         newContact.gravatar = md5(newContact.email);
         newContact.save(function(err, contact) {
@@ -26,7 +44,7 @@ module.exports = {
                 res.json(contact);
             }
         });
-    },
+    },*/
     // update: function(req, res) {
     //     console.log(req.body);
     //     models.Contact.update({ _id: req.body.id }, req.body, function(err, updated) {
@@ -37,7 +55,7 @@ module.exports = {
     //         }
     //     })
     // },
-    delete: function(req, res) {
+    /*delete: function(req, res) {
         models.Contact.findOne({ _id: req.params.id }, function(err, contact) {
             if (err) {
                 res.json({error: 'Contact not found.'});
@@ -47,5 +65,5 @@ module.exports = {
                 })
             }
         });
-    }
+    }*/
 };

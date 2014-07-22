@@ -1,11 +1,14 @@
 var home = require('../controllers/home'),
-    contacts = require('../controllers/contacts');
+    data = require('../controllers/data');
 
 module.exports.initialize = function(app) {
     app.get('/', home.index);
-    app.get('/api/contacts', contacts.index);
-    app.get('/api/contacts/:id', contacts.getById);
-    app.post('/api/contacts', contacts.add);
+    app.get('/api/albums', data.albums);
+    app.get('/api/albums/:id', data.albumsGetById);
+    app.get('/api/albums/:id/photos', data.photosInAlbumGetById);
+    //app.get('/api/albums/:aid/photos/:pid', contacts.getById);
+    app.get('/api/photos/:id', data.photosGetById);
+    // app.post('/api/contacts', contacts.add);
     // app.put('/api/contacts', contacts.update);
-    app.delete('/api/contacts/:id', contacts.delete);
+    // app.delete('/api/contacts/:id', contacts.delete);
 };
