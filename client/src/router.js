@@ -2,7 +2,8 @@
 
 module.exports = Router = Marionette.AppRouter.extend({
     appRoutes: {
-        ''  : 'home'
+        ''  : 'home',
+        'album/:id' : 'openAlbum'
 /*        'details/:id' : 'details',
         'add' : 'add'*/
     }

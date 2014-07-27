@@ -6,7 +6,9 @@ var Marionette = require('backbone.marionette'),
 module.exports = Controller = Marionette.Controller.extend({
     initialize: function() {
         App.core.vent.trigger('app:log', 'Controller: Initializing');
-        window.App.views.albumsView = new AlbumsView({ collection: window.App.data.albums });
+        View = new AlbumsView({ collection: window.App.data.albums })
+        /*window.App.data.albums.byPath("");*/
+        window.App.views.albumsView = View;
     },
 
     home: function() {
@@ -19,8 +21,8 @@ module.exports = Controller = Marionette.Controller.extend({
     openAlbum: function(id){
         var self = this;
         App.core.vent.trigger('app:log', 'Controller: "Open Album" route hit.');
-        console.log('/api/albums'+id+'/photos');
-        var photos = new PhotosCollection();
+        console.log('/api/albums/'+id);
+        var photos = new PhotosCollection([], {albumID: id});
         photos.fetch({
             success: function() {
                 App.core.vent.trigger('app:log', 'Success');
@@ -28,7 +30,7 @@ module.exports = Controller = Marionette.Controller.extend({
                 window.App.views.photosView = new PhotosView({collection: window.App.data.photos});
                 var view = window.App.views.photosView;
                 self.renderView(view);
-                window.App.router.navigate('album/'+id+'/photos');
+                window.App.router.navigate('album/'+id);
             }
         });        
     },

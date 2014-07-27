@@ -17334,7 +17334,14 @@ var Backbone = require('backbone'),
 
 module.exports = AlbumsCollection = Backbone.Collection.extend({
     model:  AlbumModel,
-    url: '/api/albums'
+    url: '/api/albums'/*,
+    what: function(){console.log('whaaaat')},
+    byPath: function(path) {
+    	filtered = this.filter(function(album) {
+    		return album.get("path") === path;
+    	});
+    	return new AlbumCollection(filtered);
+    }*/
 });
 
 },{"../models/album":6}],3:[function(require,module,exports){
@@ -17345,7 +17352,10 @@ module.exports = PhotosCollection = Backbone.Collection.extend({
     model:  PhotoModel,
     url: '/api/photos',
     initialize: function(models, options){
-    	//this.model.url = modelURL;
+    	console.log(options.albumID);
+
+    	this.url = '/api/albums/'+options.albumID+'/photos';
+    	console.log(this.url);
     }
 });
 },{"../models/photo":7}],4:[function(require,module,exports){
@@ -17357,7 +17367,9 @@ var Marionette = require('backbone.marionette'),
 module.exports = Controller = Marionette.Controller.extend({
     initialize: function() {
         App.core.vent.trigger('app:log', 'Controller: Initializing');
-        window.App.views.albumsView = new AlbumsView({ collection: window.App.data.albums });
+        View = new AlbumsView({ collection: window.App.data.albums })
+        /*window.App.data.albums.byPath("");*/
+        window.App.views.albumsView = View;
     },
 
     home: function() {
@@ -17370,8 +17382,8 @@ module.exports = Controller = Marionette.Controller.extend({
     openAlbum: function(id){
         var self = this;
         App.core.vent.trigger('app:log', 'Controller: "Open Album" route hit.');
-        console.log('/api/albums'+id+'/photos');
-        var photos = new PhotosCollection();
+        console.log('/api/albums/'+id);
+        var photos = new PhotosCollection([], {albumID: id});
         photos.fetch({
             success: function() {
                 App.core.vent.trigger('app:log', 'Success');
@@ -17379,7 +17391,7 @@ module.exports = Controller = Marionette.Controller.extend({
                 window.App.views.photosView = new PhotosView({collection: window.App.data.photos});
                 var view = window.App.views.photosView;
                 self.renderView(view);
-                window.App.router.navigate('album/'+id+'/photos');
+                window.App.router.navigate('album/'+id);
             }
         });        
     },
@@ -17421,27 +17433,18 @@ var Backbone = require('backbone');
 module.exports = PhotoModel = Backbone.Model.extend({
 	idAttribute: '_id',
 	urlRoot: 'api/photos',
-	/*initialize: function(model) {
-		$.ajax({
-			url:"/photo/"+model._id,
-			type: "get"
-		})
-		.success(function(response){
-			console.log('success');
-			this.pic = response;
-		})
-		.error(function(){
-			console.log('error');
-		});	
-		console.log('done');	
-	}*/
+	initialize: function(model) {
+		urlRoot = '/api/photos/' + model._id;
+		console.log(urlRoot);
+	}
 });
 },{}],8:[function(require,module,exports){
  var Marionette = require('backbone.marionette');
 
 module.exports = Router = Marionette.AppRouter.extend({
     appRoutes: {
-        ''  : 'home'
+        ''  : 'home',
+        'album/:id' : 'openAlbum'
 /*        'details/:id' : 'details',
         'add' : 'add'*/
     }
@@ -17524,13 +17527,14 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
 
   buffer += "<div class=\"col-xs-6 col-md-3\">\r\n	<div class=\"thumbnail\">\r\n		<strong>";
-  if (stack1 = helpers.name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
-  else { stack1 = depth0.name; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
-  buffer += escapeExpression(stack1);
   if (stack1 = helpers.path) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = depth0.path; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
   buffer += escapeExpression(stack1)
-    + "</strong>\r\n		<img src=\"../Photos/";
+    + "/";
+  if (stack1 = helpers.name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = depth0.name; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "</strong>\r\n		<img style=\"height:250px\";width:auto src=\"../Photos/";
   if (stack1 = helpers.path) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = depth0.path; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
   buffer += escapeExpression(stack1)

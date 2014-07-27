@@ -5,6 +5,9 @@ module.exports = PhotosCollection = Backbone.Collection.extend({
     model:  PhotoModel,
     url: '/api/photos',
     initialize: function(models, options){
-    	//this.model.url = modelURL;
+    	console.log(options.albumID);
+
+    	this.url = '/api/albums/'+options.albumID+'/photos';
+    	console.log(this.url);
     }
 });

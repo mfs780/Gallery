@@ -18,7 +18,7 @@ module.exports = {
             filters: ["Temp", "_Temp"]
         };
 
-        walker = walk.walk("./photos", options);
+        walker = walk.walk("./public/photos", options);
 
         walker.on("names", function(root, nodeNamesArray) {
             //console.log("names");
@@ -30,7 +30,7 @@ module.exports = {
         });
 
         walker.on("directories", function(root, dirsStatsArray, next) {
-            var array = root.split("/").splice(2);
+            var array = root.split("/").splice(3);
             var path = array.join("/");
 
             _.each(dirsStatsArray, function(e, i , a){
@@ -61,7 +61,7 @@ module.exports = {
         });
 
         walker.on("file", function(root, fileStats, next) {
-            var array = root.split("/").splice(2);
+            var array = root.split("/").splice(3);
             var path = array.join("/");
             var albumName = array[array.length-1];
             var albumPath = array.slice(0,-1).join("/");         
