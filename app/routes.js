@@ -3,7 +3,9 @@ var home = require('../controllers/home'),
 
 module.exports.initialize = function(app) {
     app.get('/', home.index);
+    app.get('/photo/:id', data.getPhoto);
     app.get('/api/albums', data.albums);
+    app.get('/api/photos', data.photos);
     app.get('/api/albums/:id', data.albumsGetById);
     app.get('/api/albums/:id/photos', data.photosInAlbumGetById);
     //app.get('/api/albums/:aid/photos/:pid', contacts.getById);

@@ -1,9 +1,29 @@
 var models = require('../app/models'),
+    fs = require('fs'),
+    url = require('url'),
     md5 = require('MD5');
 
 module.exports = {
+    getPhoto: function(req, res){
+        models.Photo.findOne({ _id: req.params.id }, function(err, data) {
+            if (err) {
+                res.json({error: 'Photo not found.'});
+            } else {
+                console.log('./photos/'+data.path+'/'+data.name);
+                res.writeHead(200, {'Content-Type': 'image/jpg' });
+                console.log(req.params);
+                var img = fs.readFileSync('./photos/'+data.path+'/'+data.name);
+                res.end(img, 'binary');
+            }
+        });        
+    },
     albums: function(req, res) {
         models.Album.find({}, function(err, data) {
+            res.json(data);
+        });
+    },
+    photos: function(req, res) {
+        models.Photo.find({}, function(err, data) {
             res.json(data);
         });
     },

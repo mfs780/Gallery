@@ -16,7 +16,7 @@ var Album = new Schema({
     lock:        { type: Boolean },
     description: { type: String },
     date:        { type: Date },
-    photos:      [Photo],
+    photos:      [String],
     albums:      [Album],
     people:      [People]
 });

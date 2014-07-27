@@ -1,4 +1,4 @@
-var App = require('../src/app.js'),
+/*var App = require('../src/app.js'),
     Marionette = require('backbone.marionette');
 
 describe('App', function() {
@@ -25,4 +25,4 @@ describe('App', function() {
             expect(App.data).toBeDefined();
         });
     });
-});
+});*/

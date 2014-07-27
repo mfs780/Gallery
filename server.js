@@ -4,7 +4,7 @@ var express = require('express'),
     routes = require('./app/routes'),
     exphbs = require('express3-handlebars'),
     mongoose = require('mongoose'),
-    seeder = require('./app/seeder'),
+    generate = require('./app/generate'),
     app = express();
 
 app.set('port', process.env.PORT || 3300);
@@ -29,12 +29,12 @@ if ('development' == app.get('env')) {
 }
 
 //connect to the db server:
-mongoose.connect('mongodb://localhost/MyApp');
+mongoose.connect('mongodb://localhost/Gallery');
 mongoose.connection.on('open', function() {
     console.log("Connected to Mongoose...");
 
     // check if the db is empty, if so seed it with some contacts:
-    seeder.check();
+    generate.traverse();
 });
 
 //routes list:

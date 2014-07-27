@@ -52,6 +52,13 @@ module.exports = function(grunt) {
                                 backbone: 'Backbone',
                                 underscore: '_'
                             }
+                        },
+                        'bootstrap': {
+                            path: 'client/requires/bootstrap/js/bootstrap.js',
+                            exports: 'Bootstrap',                       
+                            depends: {
+                                jquery: '$'
+                            }
                         }
                     }
                 }
@@ -84,6 +91,7 @@ module.exports = function(grunt) {
                     'build/<%= pkg.name %>.css': [
                         'client/styles/reset.css',
                         'client/requires/*/css/*',
+                        'client/requires/bootstrap/css/bootstrap.css',
                         'client/styles/less/main.less'
                     ]
                 }

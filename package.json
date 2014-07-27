@@ -22,7 +22,8 @@
     "MD5": "~1.2.0",
     "walk": "*",
     "exif": "git://github.com/cianclarke/node-exif.git",
-    "imagemagick" : "*"
+    "imagemagick" : "*",
+    "underscore" : "*"
   },
   "devDependencies": {
     "bower": "~1.2.8",
