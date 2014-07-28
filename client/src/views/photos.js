@@ -11,7 +11,7 @@ var itemView = Marionette.ItemView.extend({
 
     openPhoto: function() {
         window.App.core.vent.trigger('app:log', 'Photos View: openPhoto hit.');
-        window.app.controller.openPhoto(this.model.id);
+        window.App.controller.openPhoto(this.model.id);
     }
 });
 

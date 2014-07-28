@@ -22,6 +22,7 @@ app.use(express.methodOverride());
 app.use(express.cookieParser('some-secret-value-here'));
 app.use(app.router);
 app.use('/', express.static(path.join(__dirname, 'public')));
+app.disable('etag');
 
 // development only
 if ('development' == app.get('env')) {

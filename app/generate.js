@@ -71,7 +71,10 @@ module.exports = {
             models.Album.findOne({name: albumName, path: albumPath}, function(err, album){
                 if(album) {
 
-                    models.Photo.find({name: fileStats.name, path: path}, function(err, photo){               
+                    models.Photo.find({name: fileStats.name, path: path}, function(err, photo){
+
+                        console.log(root+'/'+fileStats.name);
+                                  
 
                         if (err) return handleError(err);
                         if (!photo.length && fileStats.name !== "Thumbs.db") {

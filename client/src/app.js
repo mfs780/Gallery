@@ -2,6 +2,7 @@ var Marionette = require('backbone.marionette'),
     Controller = require('./controller'),
     Router = require('./router'),
     AlbumModel = require('./models/album'),
+    PhotosCollection = require('./collections/photos'),
     AlbumsCollection = require('./collections/albums');
 
 module.exports = App = function App() {};
@@ -16,6 +17,14 @@ App.prototype.start = function(){
         App.data = {};
 
         // load up some initial data:
+        var photos = new PhotosCollection();
+        photos.fetch({
+            success: function() {
+                App.core.vent.trigger('app:log', 'Success');
+                App.data.photos = photos;
+            }
+        });
+        
         var albums = new AlbumsCollection();
         albums.fetch({
             success: function() {

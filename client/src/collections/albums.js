@@ -3,12 +3,12 @@ var Backbone = require('backbone'),
 
 module.exports = AlbumsCollection = Backbone.Collection.extend({
     model:  AlbumModel,
-    url: '/api/albums'/*,
-    what: function(){console.log('whaaaat')},
+    url: '/api/albums',
     byPath: function(path) {
-    	filtered = this.filter(function(album) {
-    		return album.get("path") === path;
-    	});
-    	return new AlbumCollection(filtered);
-    }*/
+        filtered = this.filter(function(album) {
+            return album.get("path") === path;
+        });
+        console.log(filtered);
+        return new AlbumsCollection(filtered);
+    }
 });
