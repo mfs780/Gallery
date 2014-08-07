@@ -2,7 +2,7 @@ var mongoose = require('mongoose'),
     models = require('./models'),
     _ = require('underscore'),
     fs = require('fs'),
-    exif = require('exif.js'),
+    ExifImage = require('exif').ExifImage,
     walk = require('walk'),
     util = require('util'),
     path = require('path'),
@@ -12,6 +12,19 @@ module.exports = {
     traverse: function() {
 
         console.log("traverse");
+
+        console.log('resize');
+        /*fds.mkdir('./thumbnails', function(error) {
+            console.log(error);
+        });
+        imc.resize({
+            srcPath: './001.jpg',
+            dstPath: './thumbnails/001-small.jpg',
+            width: 256
+        }, function(err, stdout, stderr) {
+            if (err) throw err;
+            console.log('resized kittens.jpg to fit within 256x256px');
+        });*/
 
         var options = {
             followLinks: false,
@@ -27,33 +40,39 @@ module.exports = {
                 if (a < b) return -1;
                 return 0;
             });
+
         });
 
         walker.on("directories", function(root, dirsStatsArray, next) {
             var array = root.split("/").splice(3);
             var path = array.join("/");
 
-            _.each(dirsStatsArray, function(e, i , a){
-                if(e.type === 'directory'){
+            _.each(dirsStatsArray, function(e, i, a) {
+                if (e.type === 'directory') {
 
                     var albumName = e.name;
 
-                    models.Album.find({name: albumName, path: path}, function(err, album){
-
-                    if (err) return handleError(err);
-                    if (!album.length)  {
-                        //Creete New Album
-                        var newAlbum = new models.Album({
+                    if (albumName !== "thumbnails") {
+                        models.Album.find({
                             name: albumName,
                             path: path
+                        }, function(err, album) {
+
+                            if (err) return handleError(err);
+                            if (!album.length) {
+                                //Creete New Album
+                                var newAlbum = new models.Album({
+                                    name: albumName,
+                                    path: path
+                                });
+                                newAlbum.save(function(err, album) {
+                                    console.log('Successfully created Album: ' + album._id);
+                                });
+                            } else {
+                                console.log('Album Already Exists');
+                            };
                         });
-                        newAlbum.save(function(err, album){
-                            console.log('Successfully created Album: ' + album._id);    
-                        });                        
-                    } else {
-                        console.log('Album Already Exists');
-                    };
-                });
+                    }
 
                 }
                 next();
@@ -63,48 +82,62 @@ module.exports = {
         walker.on("file", function(root, fileStats, next) {
             var array = root.split("/").splice(3);
             var path = array.join("/");
-            var albumName = array[array.length-1];
-            var albumPath = array.slice(0,-1).join("/");         
+            var albumName = array[array.length - 1];
+            var albumPath = array.slice(0, -1).join("/");
 
             //console.log(albumName + ' @ ' + albumPath);
 
-            models.Album.findOne({name: albumName, path: albumPath}, function(err, album){
-                if(album) {
+            models.Album.findOne({
+                name: albumName,
+                path: albumPath
+            }, function(err, album) {
+                if (album) {
 
-                    models.Photo.find({name: fileStats.name, path: path}, function(err, photo){
+                    models.Photo.find({
+                        name: fileStats.name,
+                        path: path
+                    }, function(err, photo) {
 
-                        console.log(root+'/'+fileStats.name);
-                                  
+                        //console.log(root+'/'+fileStats.name);
 
                         if (err) return handleError(err);
                         if (!photo.length && fileStats.name !== "Thumbs.db") {
+
+                            fs.mkdir(root + '/thumbnails', function(error) {
+                                //console.log(error);
+                            });
+                            im.resize({
+                                srcPath: root + '/' + fileStats.name,
+                                dstPath: root + '/thumbnails/' + fileStats.name,
+                                width: 256
+                            }, function(err, stdout, stderr) {
+                                if (err) throw err;
+                                console.log('resized ' + fileStats.name);
+                            });
                             //Create New Photo
                             var newPhoto = new models.Photo({
                                 name: fileStats.name,
                                 path: path,
                                 album: album._id
                             });
+
                             newPhoto.save(function(err, photo) {
-                                console.log('Successfully created photo: ' + photo._id);
+                                //console.log('Successfully created photo: ' + photo._id);
                                 album.photos.push(photo._id);
-                                album.save(function(err, album){
-                                    console.log('Album '+ album._id +' updated with photo: ' + photo._id);
+                                album.save(function(err, album) {
+                                    //console.log('Album '+ album._id +' updated with photo: ' + photo._id);
                                 });
                             });
                         } else {
-                            console.log("Photo Already Exists")
+                            //console.log("Photo Already Exists")
                         };
-
-                        
                     });
-                    
+
                 }
             });
-            
+
 
             next();
-
-
         });
 
         walker.on("errors", function(root, nodeStatsArray, next) {
