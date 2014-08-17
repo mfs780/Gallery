@@ -5,6 +5,6 @@ module.exports = PhotoModel = Backbone.Model.extend({
 	urlRoot: 'api/photos',
 	initialize: function(model) {
 		urlRoot = '/api/photos/' + model._id;
-		console.log(urlRoot);
+		this.bind('change', function(){ this.save(); });
 	}
 });

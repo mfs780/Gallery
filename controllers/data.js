@@ -17,6 +17,9 @@ module.exports = {
             }
         });        
     },
+    fullPhoto: function(req, res){
+        console.log('in pic');       
+    },
     albums: function(req, res) {
         models.Album.find({}, function(err, data) {
             res.json(data);
@@ -54,6 +57,17 @@ module.exports = {
             }
         });
     },
+
+    updatePhoto: function(req, res) {
+        console.log(req.body);
+        models.Photo.update({ _id: req.body._id}, req.body, function(err, updated){
+            if (err) {
+                res.json({error: 'Photo not found.'});
+            } else {
+                res.json(updated);
+            }
+        })
+    }
     /*add: function(req, res) {
         var newContact = new models.Contact(req.body);
         newContact.gravatar = md5(newContact.email);

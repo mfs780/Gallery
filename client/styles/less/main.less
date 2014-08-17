@@ -1,4 +1,4 @@
-body { padding: 10px; font: 14px "Lucida Grande", Helvetica, Arial, sans-serif; }
+body { padding: 0px; font: 14px "Lucida Grande", Helvetica, Arial, sans-serif; }
 
 a { color: #00B7FF; }
 h1 { font-size: 2em; font-weight: bold; margin-bottom: 1em;}
@@ -6,7 +6,7 @@ strong { font-weight: bold; }
 label { display: block; float: left; width: 120px; clear: left; }
 .clear { clear: both; }
 
-#content { height: 300px; }
+#content { height: 300px; width: 95%; margin: 0 auto }
 
 .contact_small, .contact_full { cursor: pointer; width: 260px; float: left; border: solid 1px #c0c0c0; padding: 5px; margin-right: 10px; margin-bottom: 10px; }
 .contact_small:hover { border: solid 1px blue;}
@@ -19,3 +19,14 @@ label { display: block; float: left; width: 120px; clear: left; }
 
 #output {margin-top: 2em; font-size: .9em; border: solid 1px #c0c0c0; background-color: #f0f0f0; padding: 5px;}
 #output li {margin-left: 30px; list-style-type: decimal;}
+#detail {margin-left: 30px;}
+
+div {display: block}
+.thumbTop {padding-left: 0px; padding-right: 0px; margin: 0px 20px 20px 20px; width: 250px; padding-bottom: 1px; box-shadow: 3px 2px 2px rgba(0,0,0,0.1)}
+.thumb {border: 1px solid #ddd; border-right: 0; background: #fff}
+.thumb img {border-bottom: 1px solid #ddd; transition: opacity 0.3 ease;}
+
+.thumbInfo {display:table-row; width: 100%}
+.thumbInfo div {padding: 10px; text-align: center; vertical-align: middle}
+.thumbTitle {display: table-cell; width: 100%}
+.thumbCount {display: table-cell; width: 35%; border-left: 1px solid #ddd}

@@ -6194,6 +6194,81 @@ if (typeof jQuery === 'undefined') { throw new Error('Bootstrap\'s JavaScript re
 
 },{"jquery":"cDzA+Q"}],"bootstrap":[function(require,module,exports){
 module.exports=require('nzub2F');
+},{}],"nAkl6L":[function(require,module,exports){
+var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
+
+; global.$ = require("jquery");
+//This jQuery plugin is used for making page text editable
+(function ($) {
+
+    $.fn.inline = function (options) {
+        var element = $(this),
+            settings = $.extend({currentValue: element.text(),
+                defaultValue: ""
+            }, options);
+
+            //console.log('settings.defaultValue', settings.defaultValue);
+
+        var main = function () {
+            
+            var textElement = $(this);
+            var tempField = $('<input name="temp" type="text"></input>');
+
+            textElement.hide();
+            textElement.after(tempField);
+            tempField.text(settings.currentValue);
+
+            if(settings.defaultValue == settings.currentValue){
+               tempField.val("");
+            }
+            else {
+                tempField.val(settings.currentValue);
+            }
+            
+            tempField.focus();
+
+            tempField.on("blur keydown", function (event) {
+    
+                var newValue = element.text(tempField.val());
+
+                if (event.which === 0) {
+                    if(tempField.val() == ""){
+                        tempField.val(settings.defaultValue);
+                    }
+                    element.text(tempField.val());
+                    element.show();
+                    settings.callback(tempField.val());
+                    tempField.remove();
+                    settings.currentValue = tempField.val();
+                    console.log(settings.currentValue);
+                } 
+                else if (event.which === 13) {
+                    if(tempField.val() == ""){
+                        tempField.val(settings.defaultValue);
+                    }
+                    element.text(tempField.val());
+                    element.show();
+                    settings.callback(tempField.val());
+                    tempField.remove();
+                    settings.currentValue = tempField.val();
+                }
+
+                if (element.text() == ""){
+                    element.text(settings.currentValue);
+                }
+            })
+        };
+        element.on("click", main);
+    };
+    
+})(jQuery);
+
+; browserify_shim__define__module__export__(typeof Inline != "undefined" ? Inline : window.Inline);
+
+}).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
+
+},{"jquery":"cDzA+Q"}],"inline":[function(require,module,exports){
+module.exports=require('nAkl6L');
 },{}],"cDzA+Q":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 /*!
@@ -17277,7 +17352,7 @@ var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? 
 
 },{}],"underscore":[function(require,module,exports){
 module.exports=require('DRbhrH');
-},{}]},{},["9jqLJ0","KS2Igo","cDzA+Q","nzub2F","DRbhrH"])
+},{}]},{},["9jqLJ0","nzub2F","KS2Igo","nAkl6L","cDzA+Q","DRbhrH"])
 ;
 ;(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var Marionette = require('backbone.marionette'),
@@ -17348,7 +17423,12 @@ module.exports = AlbumsCollection = Backbone.Collection.extend({
         filtered = this.filter(function(album) {
             return album.get("path") === path;
         });
-        console.log(filtered);
+        return new AlbumsCollection(filtered);
+    },
+    byName: function(name){
+        filtered = this.filter(function(album){
+            return album.get("name") === name;
+        });
         return new AlbumsCollection(filtered);
     }
 });
@@ -17362,10 +17442,8 @@ module.exports = PhotosCollection = Backbone.Collection.extend({
 	url: '/api/photos',
 	initialize: function(models, options) {
 		if(options){
-			console.log(options.albumID);
 			this.url = '/api/albums/' + options.albumID + '/photos';
-			console.log(this.url);
-		}		
+		}
 	}
 });
 },{"../models/photo":7}],4:[function(require,module,exports){
@@ -17373,12 +17451,15 @@ var Marionette = require('backbone.marionette'),
     AlbumsView = require('./views/albums'),
     PhotosView = require('./views/photos'),
     PhotoDetailsView = require('./views/photo_details'),
-    PhotosCollection = require('./collections/photos');
+    PhotosCollection = require('./collections/photos'),
+    inline = require('inline');
 
 module.exports = Controller = Marionette.Controller.extend({
     initialize: function() {
         App.core.vent.trigger('app:log', 'Controller: Initializing');
-        View = new AlbumsView({ collection: window.App.data.albums.byPath("")});
+        View = new AlbumsView({
+            collection: window.App.data.albums.byPath("")
+        });
         window.App.views.albumsView = View;
     },
 
@@ -17389,42 +17470,67 @@ module.exports = Controller = Marionette.Controller.extend({
         window.App.router.navigate('#');
     },
 
-    openAlbum: function(id){
+    openAlbum: function(id) {
         var self = this;
         App.core.vent.trigger('app:log', 'Controller: "Open Album" route hit.');
-        console.log('/api/albums/'+id);
-        var photos = new PhotosCollection([], {albumID: id});
+        console.log('/api/albums/' + id);
+        var photos = new PhotosCollection([], {
+            albumID: id
+        });
         photos.fetch({
             success: function() {
                 App.core.vent.trigger('app:log', 'Success');
-                App.data.photos = photos;
+                App.data.currPhotos = photos;
                 console.log(photos.models[0].attributes.path);
-                window.App.views.photosView = new PhotosView({collection: window.App.data.photos});
+                window.App.views.photosView = new PhotosView({
+                    collection: window.App.data.currPhotos
+                });
                 var view = window.App.views.photosView;
-                self.renderView(self.moreAlbums(photos.models[0].attributes.path),view);
-                window.App.router.navigate('album/'+id);
+                self.renderView(self.moreAlbums(photos.models[0].attributes.path), view);
+                window.App.router.navigate('album/' + id);
             }
-        });        
+        });
     },
 
-    moreAlbums: function(path){
+    moreAlbums: function(path) {
         var self = this;
-        view = new AlbumsView({ collection: window.App.data.albums.byPath(path)});
+        view = new AlbumsView({
+            collection: window.App.data.albums.byPath(path)
+        });
         return view;
     },
 
-    openPhoto: function(id){
+    openPhoto: function(id) {
+        var self = this;
         App.core.vent.trigger('app:log', 'Controller: "Open Photo" route hit.');
-        var view = new PhotoDetailsView({model: window.App.data.photos.get(id)});
+        var model = window.App.data.currPhotos.get(id);
+        var view = new PhotoDetailsView({
+            model: model
+        });
         this.renderView(view);
+        console.log(view.model);
+        //view.setInline($('#caption'));
+        $('#caption').inline({
+            textSize: "250%",
+            defaultValue: "Click to create a Caption",
+            callback: (function(c) {
+                model.set({
+                    caption: c
+                });
+            })
+        });
         window.App.router.navigate('photo/' + id);
+    },
+
+    setCaption: function() {
+        console.log("caption set");
     },
 
     renderView: function(view, other) {
         this.destroyCurrentView(view);
         App.core.vent.trigger('app:log', 'Controller: Rendering new view.');
         $('#main-app').html(view.render().el);
-        if(other) $('#main-app').append(other.render().el);
+        if (other) $('#main-app').append(other.render().el);
     },
 
     destroyCurrentView: function(view) {
@@ -17435,7 +17541,6 @@ module.exports = Controller = Marionette.Controller.extend({
         window.App.views.currentView = view;
     }
 });
-
 },{"./collections/photos":3,"./views/albums":9,"./views/photo_details":10,"./views/photos":11}],5:[function(require,module,exports){
 var App = require('./app');
 var myapp = new App();
@@ -17445,8 +17550,23 @@ myapp.start();
 var Backbone = require('backbone');
 
 module.exports = AlbumModel = Backbone.Model.extend({
-    idAttribute: '_id',
-    urlRoot: 'api/albums'
+	idAttribute: '_id',
+	thumbnail: '',
+	urlRoot: 'api/albums',
+	initialize: function() {
+		this.setThumb();
+	},
+	setThumb: function() {
+		var rand = Math.floor(Math.random() * this.get('__v'));
+		var photoID = this.get('photos')[rand];
+		var photoModel = window.App.data.photos.get(photoID);
+		var photoName = photoModel.get('name');
+
+		var path = (this.get('path') === "")? this.get('path'): this.get('path') + '/';		
+		var src = "../Photos/"+path + this.get('name') +"/thumbnails/"+ photoName;
+
+		this.set('thumb', src);
+	}
 });
 },{}],7:[function(require,module,exports){
 var Backbone = require('backbone');
@@ -17456,7 +17576,7 @@ module.exports = PhotoModel = Backbone.Model.extend({
 	urlRoot: 'api/photos',
 	initialize: function(model) {
 		urlRoot = '/api/photos/' + model._id;
-		console.log(urlRoot);
+		this.bind('change', function(){ this.save(); });
 	}
 });
 },{}],8:[function(require,module,exports){
@@ -17465,7 +17585,8 @@ module.exports = PhotoModel = Backbone.Model.extend({
 module.exports = Router = Marionette.AppRouter.extend({
     appRoutes: {
         ''  : 'home',
-        'album/:id' : 'openAlbum'
+        'album/:id' : 'openAlbum',
+        'photo/:id' : 'openPhoto'
 /*        'details/:id' : 'details',
         'add' : 'add'*/
     }
@@ -17480,7 +17601,7 @@ var itemView = Marionette.ItemView.extend({
         this.listenTo(this.model, 'change', this.render);
     },
     events: {
-        'click': 'openAlbum'
+        'click .thumb': 'openAlbum'
     },
 
     openAlbum: function() {
@@ -17497,18 +17618,33 @@ module.exports = CollectionView = Marionette.CollectionView.extend({
 });
 
 },{"../../templates/album_small.hbs":12}],10:[function(require,module,exports){
-var Marionette = require('backbone.marionette');
+var Marionette = require('backbone.marionette'),
+    inline = require('inline');
 
 module.exports = PhotoDetailsView = Marionette.ItemView.extend({
-    template: require('../../templates/photo_details.hbs'),
-    events: {
-        'click a.back': 'goBack'
-    },
+	template: require('../../templates/photo_details.hbs'),
+	events: {
+		'click #prev': 'prev',
+		'click #next': 'next',
+		'update_caption': 'changeCaption'
+	},
 
-    goBack: function(e) {
-        e.preventDefault();
-        window.App.controller.home();
-    }
+	initialize: function() {
+		this.model.on('change', this.render, this);
+		this.index = this.model.collection.indexOf(this.model);
+	},
+
+	prev: function(e) {		
+		e.preventDefault();
+		var newModel = this.model.collection.at(this.index - 1);
+		window.App.controller.openPhoto(newModel.id);
+	},
+
+	next: function(e) {		
+		e.preventDefault();
+		var newModel = this.model.collection.at(this.index + 1);
+		window.App.controller.openPhoto(newModel.id);
+	}
 });
 },{"../../templates/photo_details.hbs":13}],11:[function(require,module,exports){
 var Marionette = require('backbone.marionette');
@@ -17519,7 +17655,7 @@ var itemView = Marionette.ItemView.extend({
         this.listenTo(this.model, 'change', this.render);
     },
     events: {
-        'click': 'openPhoto'
+        'click .thumb': 'openPhoto'
     },
 
     openPhoto: function() {
@@ -17544,15 +17680,19 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression;
 
 
-  buffer += "<div class=\"col-xs-6 col-md-3\">\r\n	<div class=\"thumbnail\">\r\n		<strong>";
-  if (stack1 = helpers.path) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
-  else { stack1 = depth0.path; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
+  buffer += "<div class=\"col-xs-6 col-md-3 thumbTop\">\r\n	<div class=\"thumb\">\r\n		<div class-\"img-wrapper\">\r\n			<img style=\"width:250px;height:auto\" src=\"";
+  if (stack1 = helpers.thumb) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = depth0.thumb; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
   buffer += escapeExpression(stack1)
-    + "/";
+    + "\">\r\n		</div>\r\n		<div class=\"thumbInfo\">\r\n			<div class=\"thumbTitle\">\r\n				<span>";
   if (stack1 = helpers.name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = depth0.name; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
   buffer += escapeExpression(stack1)
-    + "</strong>\r\n		<img src=\"http://placehold.it/350x150\">\r\n    </div>\r\n</div>\r\n";
+    + "</span>\r\n			</div>\r\n			<div class=\"thumbCount\">\r\n				<span class=\"glyphicon glyphicon-picture\"> ";
+  if (stack1 = helpers.__v) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = depth0.__v; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\r\n			</div>\r\n		</div>\r\n    </div>\r\n</div>\r\n";
   return buffer;
   });
 
@@ -17565,7 +17705,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression;
 
 
-  buffer += "<div>\r\n	<strong>";
+  buffer += "<div id=\"detail\">\r\n	<strong>";
   if (stack1 = helpers.path) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = depth0.path; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
   buffer += escapeExpression(stack1)
@@ -17573,7 +17713,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   if (stack1 = helpers.name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = depth0.name; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
   buffer += escapeExpression(stack1)
-    + "</strong>\r\n	<img style=\"height:auto;width:auto;max-width:100%;max-height:100%\" src=\"../Photos/";
+    + "</strong>\r\n	<a id=\"prev\">prev</a>\r\n	<a id=\"next\">next</a>\r\n	<div>\r\n	<img id=\"photo_detail\" style=\"height:auto; max-width:70%; align=center; valign=middle\" src=\"../Photos/";
   if (stack1 = helpers.path) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = depth0.path; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
   buffer += escapeExpression(stack1)
@@ -17581,7 +17721,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   if (stack1 = helpers.name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = depth0.name; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\">\r\n</div>";
+    + "\">\r\n	</div>\r\n	<div id=\"caption\">";
+  if (stack1 = helpers.caption) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = depth0.caption; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "</div>\r\n</div>";
   return buffer;
   });
 
@@ -17594,23 +17738,19 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression;
 
 
-  buffer += "<div class=\"col-xs-6 col-md-3\">\r\n	<div class=\"thumbnail\">\r\n		<strong>";
+  buffer += "<div class=\"col-xs-6 col-md-3 thumbTop\">\r\n	<div class=\"thumb\">\r\n		<div class-\"img-wrapper\">\r\n			<img style=\"width:250px;height:auto\" src=\"../Photos/";
   if (stack1 = helpers.path) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = depth0.path; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
   buffer += escapeExpression(stack1)
-    + "/";
+    + "/thumbnails/";
   if (stack1 = helpers.name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = depth0.name; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
   buffer += escapeExpression(stack1)
-    + "</strong>\r\n		<img style=\"height:250px;width:auto\" src=\"../Photos/";
-  if (stack1 = helpers.path) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
-  else { stack1 = depth0.path; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
+    + "\">\r\n		</div>\r\n		<div class=\"thumbInfo\">\r\n			<div class=\"thumbTitle\">\r\n				<span>";
+  if (stack1 = helpers.caption) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = depth0.caption; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
   buffer += escapeExpression(stack1)
-    + "/";
-  if (stack1 = helpers.name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
-  else { stack1 = depth0.name; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
-  buffer += escapeExpression(stack1)
-    + "\">\r\n    </div>\r\n</div>";
+    + "</span>\r\n			</div>\r\n		</div>\r\n    </div>\r\n</div>\r\n";
   return buffer;
   });
 

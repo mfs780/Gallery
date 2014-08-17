@@ -6,7 +6,7 @@ var itemView = Marionette.ItemView.extend({
         this.listenTo(this.model, 'change', this.render);
     },
     events: {
-        'click': 'openAlbum'
+        'click .thumb': 'openAlbum'
     },
 
     openAlbum: function() {

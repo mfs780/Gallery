@@ -13,19 +13,6 @@ module.exports = {
 
         console.log("traverse");
 
-        console.log('resize');
-        /*fds.mkdir('./thumbnails', function(error) {
-            console.log(error);
-        });
-        imc.resize({
-            srcPath: './001.jpg',
-            dstPath: './thumbnails/001-small.jpg',
-            width: 256
-        }, function(err, stdout, stderr) {
-            if (err) throw err;
-            console.log('resized kittens.jpg to fit within 256x256px');
-        });*/
-
         var options = {
             followLinks: false,
             filters: ["Temp", "_Temp"]
@@ -34,7 +21,6 @@ module.exports = {
         walker = walk.walk("./public/photos", options);
 
         walker.on("names", function(root, nodeNamesArray) {
-            //console.log("names");
             nodeNamesArray.sort(function(a, b) {
                 if (a > b) return 1;
                 if (a < b) return -1;
@@ -85,8 +71,6 @@ module.exports = {
             var albumName = array[array.length - 1];
             var albumPath = array.slice(0, -1).join("/");
 
-            //console.log(albumName + ' @ ' + albumPath);
-
             models.Album.findOne({
                 name: albumName,
                 path: albumPath
@@ -98,13 +82,11 @@ module.exports = {
                         path: path
                     }, function(err, photo) {
 
-                        //console.log(root+'/'+fileStats.name);
 
                         if (err) return handleError(err);
                         if (!photo.length && fileStats.name !== "Thumbs.db") {
 
                             fs.mkdir(root + '/thumbnails', function(error) {
-                                //console.log(error);
                             });
                             im.resize({
                                 srcPath: root + '/' + fileStats.name,
@@ -118,18 +100,18 @@ module.exports = {
                             var newPhoto = new models.Photo({
                                 name: fileStats.name,
                                 path: path,
-                                album: album._id
+                                album: album._id,
+                                caption: "Click to create a Caption"
                             });
 
                             newPhoto.save(function(err, photo) {
-                                //console.log('Successfully created photo: ' + photo._id);
+
                                 album.photos.push(photo._id);
                                 album.save(function(err, album) {
-                                    //console.log('Album '+ album._id +' updated with photo: ' + photo._id);
                                 });
                             });
                         } else {
-                            //console.log("Photo Already Exists")
+                            console.log("Photo Already Exists")
                         };
                     });
 

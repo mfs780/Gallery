@@ -59,6 +59,13 @@ module.exports = function(grunt) {
                             depends: {
                                 jquery: '$'
                             }
+                        },
+                        'inline': {
+                            path: 'client/requires/inline/js/inline.js',
+                            exports: 'Inline',                       
+                            depends: {
+                                jquery: '$'
+                            }
                         }
                     }
                 }
@@ -69,7 +76,7 @@ module.exports = function(grunt) {
                 },
                 options: {
                     transform: ['hbsfy'],
-                    external: ['jquery', 'underscore', 'backbone', 'backbone.marionette']
+                    external: ['jquery', 'underscore', 'backbone', 'backbone.marionette', 'inline']
                 }
             },
             test: {
@@ -80,7 +87,7 @@ module.exports = function(grunt) {
                 },
                 options: {
                     transform: ['hbsfy'],
-                    external: ['jquery', 'underscore', 'backbone', 'backbone.marionette']
+                    external: ['jquery', 'underscore', 'backbone', 'backbone.marionette', 'inline']
                 }
             }
         },

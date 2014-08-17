@@ -1,7 +1,9 @@
 node_modules/*
 build/*
 public/photos/*
-
 node_modules/*
 build/*
-public/photos2/* 
+public/photos2/*
+
+*.db
+ggg.js
